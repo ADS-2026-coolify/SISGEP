@@ -1,0 +1,28 @@
+# Environment files
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local editor settings
+.vscode/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.venv/
+**/.venv/
+
+# Frontend dependencies and builds
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# Local data and generated files
+*.sqlite3
+SISGEP.api/media/
+SISGEP.api/staticfiles/
+SISGEP.api/artifacts/sqlite_dump.json

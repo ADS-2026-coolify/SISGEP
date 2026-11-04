@@ -1,0 +1,15 @@
+.git
+.vscode
+.venv
+**/.venv
+**/node_modules
+**/dist
+**/__pycache__
+**/*.py[cod]
+**/.env
+**/.env.*
+!.env.example
+SISGEP.api/media
+SISGEP.api/staticfiles
+SISGEP.api/db.sqlite3
+SISGEP.api/artifacts/sqlite_dump.json
