@@ -1,0 +1,78 @@
+name: SISGEP CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-tests:
+    name: Backend checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install backend dependencies
+        run: python -m pip install -r SISGEP.api/requirements.txt
+
+      - name: Check Django configuration
+        working-directory: SISGEP.api
+        env:
+          SECRET_KEY: ci-only-not-used-in-production
+        run: python manage.py check
+
+      - name: Run backend tests
+        working-directory: SISGEP.api
+        env:
+          SECRET_KEY: ci-only-not-used-in-production
+        run: python manage.py test
+
+  frontend-build:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: SISGEP.web/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: SISGEP.web
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: SISGEP.web
+        run: npm run build
+
+  deploy-coolify:
+    name: Deploy to Coolify
+    runs-on: ubuntu-latest
+    needs:
+      - backend-tests
+      - frontend-build
+    if: ${{ vars.COOLIFY_DEPLOY_ENABLED == 'true' }}
+    steps:
+      - name: Trigger Coolify deployment
+        env:
+          COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
+        run: |
+          if [ -z "$COOLIFY_WEBHOOK_URL" ]; then
+            echo "::error::Add the COOLIFY_WEBHOOK_URL repository secret before enabling deployment."
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error --retry 3 "$COOLIFY_WEBHOOK_URL"

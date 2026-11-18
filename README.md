@@ -37,3 +37,15 @@ O Compose configura `DEBUG=False`, monta a URL do banco a partir de
 `POSTGRES_PASSWORD` e executa as migrações ao iniciar a aplicação. Os arquivos
 `.env`, bancos locais, dumps de banco e configurações pessoais do editor são
 ignorados pelo Git.
+
+## CI/CD com GitHub Actions
+
+O workflow `.github/workflows/deploy-coolify.yml` executa as verificações do
+Django e compila o frontend em pushes para `main`. O job de deploy só é
+habilitado depois que a variável `COOLIFY_DEPLOY_ENABLED` for definida como
+`true` e o segredo `COOLIFY_WEBHOOK_URL` for cadastrado nas configurações de
+Actions do repositório. Até lá, o workflow valida o código sem iniciar outro
+deploy.
+
+O manual ilustrado do processo está em
+[docs/Manual-CI-CD-SISGEP-Coolify.docx](docs/Manual-CI-CD-SISGEP-Coolify.docx).
